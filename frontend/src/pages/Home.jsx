@@ -1,7 +1,17 @@
-﻿
+﻿import { useState } from 'react'
+import { Search } from 'lucide-react'
+
 function Home() {
+    const [searchQuery, setSearchQuery] = useState('')
+
+    const handleSearch = (e) => {
+        e.preventDefault()
+        // Handle search logic here
+        console.log('Searching for:', searchQuery)
+    }
+
     return (
-        <div className="bg-white min-h-screen flex flex-col items-center justify-center">
+        <div className="min-h-screen flex flex-col items-center justify-center -mt-16">
             <div className="w-full max-w-2xl mx-auto px-4">
                 {/* Minimal Branding */}
                 <div className="text-center mb-8">
@@ -37,4 +47,5 @@ function Home() {
         </div>
     )
 }
+
 export default Home

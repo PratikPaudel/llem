@@ -1,22 +1,12 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navbar'
-import Home from './components/Home'
-import Dashboard from './components/Dashboard'
-import Profile from './components/Profile'
+import { BrowserRouter as Router } from 'react-router-dom'
+import Main from './components/Main'
 import './App.css'
 
 function App() {
     return (
         <Router>
-            <div className="min-h-screen bg-gray-50">
-                <Navbar />
-                <main className="container mx-auto px-4 py-8">
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/profile" element={<Profile />} />
-                    </Routes>
-                </main>
+            <div className="min-h-screen bg-white w-full">
+                <Main />
             </div>
         </Router>
     )

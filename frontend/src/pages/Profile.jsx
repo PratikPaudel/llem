@@ -1,13 +1,6 @@
-﻿
-
-
-
-
-
-
-function Profile() {
+﻿function Profile() {
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto px-4 py-8">
             <h1 className="text-4xl font-bold text-gray-900 mb-8">Profile</h1>
             <div className="bg-white p-6 rounded-lg shadow">
                 <div className="mb-6">
