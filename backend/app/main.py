@@ -11,7 +11,7 @@ app = FastAPI(title="Voice Search API")
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "llem.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
