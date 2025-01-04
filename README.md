@@ -1,6 +1,6 @@
-# human™ - Library of Human Experiences
+# human™ - a Large Lived Experience Model (LLEM)
 
-A modern web application that allows users to search through human experiences using voice or text input, powered by AI-driven search and summarization capabilities.
+A modern web application that allows users to search through an archive of human experiences using voice or text input, powered by AI-driven search and summarization capabilities.
 
 ## Features
 
