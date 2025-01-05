@@ -2,15 +2,12 @@
 from openai import OpenAI
 from pinecone import Pinecone
 from typing import List, Dict
-from ..config import get_settings
-
-settings = get_settings()
 
 class VectorService:
     def __init__(self):
-        self.pc = Pinecone(api_key=settings.pinecone_api_key)
-        self.index = self.pc.Index(settings.pinecone_index_name)
-        self.openai_client = OpenAI(api_key=settings.openai_api_key)
+        self.pc = Pinecone(api_key="")
+        self.index = self.pc.Index("")
+        self.openai_client = OpenAI(api_key="")
 
     async def search(self, query: str, limit: int = 5) -> List[Dict]:
         try:

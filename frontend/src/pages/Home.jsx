@@ -1,14 +1,16 @@
 ﻿import React, { useState, useRef } from 'react';
 import { Search, Mic, Square, Loader } from 'lucide-react';
+import { getApiBaseUrl } from '../config';
+import StoryDisplay from '../components/StoryDisplay';
 
 function Home() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
+    const [formattedStories, setFormattedStories] = useState(null);
     const [isRecording, setIsRecording] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
     const mediaRecorder = useRef(null);
     const audioChunks = useRef([]);
-    const [isSearching, setIsSearching] = useState(false);
 
     const startRecording = async () => {
         try {
@@ -47,18 +49,18 @@ function Home() {
             const formData = new FormData();
             formData.append('file', audioBlob, 'audio.webm');
 
-            const response = await fetch('http://localhost:8000/api/transcribe', {
+            const response = await fetch(`${getApiBaseUrl()}/transcribe`, {
                 method: 'POST',
                 body: formData,
             });
 
             if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(errorData);
+                throw new Error(await response.text());
             }
 
             const data = await response.json();
             setSearchQuery(data.text.trim());
+            handleSearch(data.text.trim());
         } catch (error) {
             console.error('Error sending audio to server:', error);
             alert('Error processing audio. Please try again.');
@@ -67,14 +69,16 @@ function Home() {
         }
     };
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        if (!searchQuery.trim()) return;
+    const handleSearch = async (queryText = searchQuery) => {
+        if (!queryText.trim()) return;
 
         setIsSearching(true);
+        setFormattedStories(null);
+
         try {
-            const response = await fetch(
-                `http://localhost:8000/api/search?query=${encodeURIComponent(searchQuery)}`,
+            // Step 1: Search with query
+            const searchResponse = await fetch(
+                `${getApiBaseUrl()}/search?query=${encodeURIComponent(queryText)}`,
                 {
                     method: 'GET',
                     headers: {
@@ -83,15 +87,34 @@ function Home() {
                 }
             );
 
-            if (!response.ok) {
+            if (!searchResponse.ok) {
                 throw new Error('Search failed');
             }
 
-            const data = await response.json();
-            setSearchResults(data.results);
+            const searchData = await searchResponse.json();
+
+            // Step 2: Get formatted stories
+            const summaryResponse = await fetch(`${getApiBaseUrl()}/summarize`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    results: searchData.results,
+                    query: queryText
+                })
+            });
+
+            if (!summaryResponse.ok) {
+                throw new Error('Summarization failed');
+            }
+
+            const summaryData = await summaryResponse.json();
+            setFormattedStories(summaryData.formattedStories);
+
         } catch (error) {
-            console.error('Search error:', error);
-            alert('Failed to perform search. Please try again.');
+            console.error('Error:', error);
+            alert('Search process failed. Please try again.');
         } finally {
             setIsSearching(false);
         }
@@ -99,18 +122,20 @@ function Home() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center -mt-16">
-            <div className="w-full max-w-2xl mx-auto px-4">
+            <div className="w-full max-w-3xl mx-auto px-4">
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-semibold text-gray-900">human™</h1>
                     <p className="mt-2 text-lg text-gray-600">library of human experiences</p>
                 </div>
 
-                <form onSubmit={handleSearch}>
+                <div className="space-y-4">
+                    {/* Search Input */}
                     <div className="relative">
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                             className="w-full h-14 px-6 pr-24 rounded-lg border border-gray-200 bg-white focus:outline-none focus:border-gray-300 focus:ring-1 focus:ring-gray-300 shadow-sm text-lg"
                             placeholder="Search experiences..."
                         />
@@ -137,49 +162,42 @@ function Home() {
                                 </button>
                             )}
                             <button
-                                type="submit"
+                                onClick={() => handleSearch()}
+                                disabled={isSearching || !searchQuery.trim()}
                                 className="text-gray-400 hover:text-gray-600 focus:outline-none"
                                 aria-label="Search"
                             >
-                                <Search className="w-6 h-6"/>
+                                {isSearching ? (
+                                    <Loader className="w-6 h-6 animate-spin" />
+                                ) : (
+                                    <Search className="w-6 h-6" />
+                                )}
                             </button>
                         </div>
                     </div>
-                </form>
-                <div className="mt-8">
-                    {isSearching ? (
-                        <div className="text-center">
-                            <Loader className="w-6 h-6 text-gray-400 animate-spin mx-auto"/>
-                            <p className="mt-2 text-gray-600">Searching...</p>
+
+                    {/* Loading State */}
+                    {isSearching && (
+                        <div className="text-center py-8">
+                            <Loader className="w-8 h-8 animate-spin mx-auto text-gray-400" />
+                            <p className="mt-2 text-gray-600">Finding and analyzing stories...</p>
                         </div>
-                    ) : searchResults.length > 0 ? (
-                        <div className="space-y-4">
-                            {searchResults.map((result, index) => (
-                                <div
-                                    key={index}
-                                    className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm"
-                                >
-                                    <p className="text-gray-800">{result.text}</p>
-                                    <div className="mt-2 flex justify-between text-sm">
-                                        <span className="text-gray-500">
-                                            Source: {result.source}
-                                        </span>
-                                        <span className="text-gray-500">
-                                            Score: {(result.score * 100).toFixed(1)}%
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
+                    )}
+
+                    {/* Stories Display */}
+                    {formattedStories && formattedStories.length > 0 && (
+                        <div className="mt-8">
+                            <StoryDisplay stories={formattedStories} />
                         </div>
-                    ) : searchQuery && !isSearching ? (
-                        <p className="text-center text-gray-600">
-                            No results found for your search.
-                        </p>
-                    ) : null}
+                    )}
+
+                    {/* No Results */}
+                    {formattedStories && formattedStories.length === 0 && (
+                        <div className="text-center py-8">
+                            <p className="text-gray-600">No stories found for your search.</p>
+                        </div>
+                    )}
                 </div>
-                <p className="mt-4 text-center text-sm text-gray-500">
-                    find a perspective that inspires.
-                </p>
             </div>
         </div>
     );
