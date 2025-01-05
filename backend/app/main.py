@@ -1,11 +1,22 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import audio_router
-from .config import get_settings
 from .routers.vector_router import router as vector_router
+from .routers.summary_router import router as summary_router
+import logging
+import sys
 import os
 
-settings = get_settings()
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Voice Search API")
 
@@ -22,16 +33,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Log when routes are added
+logger.info("Adding routes to application")
 app.include_router(audio_router.router, prefix="/api", tags=["audio"])
 app.include_router(vector_router, prefix="/api", tags=["search"])
+app.include_router(summary_router, prefix="/api", tags=["summary"])
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Application starting up")
 
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))
     host = os.getenv("HOST", "0.0.0.0")
     uvicorn.run(
-        "app.main:app",  # Changed from "main:app" to "app.main:app"
+        "app.main:app",
         host=host,
         port=port,
-        reload=True
+        reload=True,
+        log_level="info"
     )

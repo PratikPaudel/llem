@@ -9,12 +9,12 @@ from ..config import get_settings
 logger = logging.getLogger(__name__)
 
 client = OpenAI(
-    api_key=get_settings().openai_api_key
+    api_key=""
 )
 async def transcribe_audio(file: UploadFile) -> str:
     logger.info("Starting transcription process")
 
-    # Check file format
+    # Check file format hi there
     allowed_formats = ('.flac', '.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.ogg', '.wav', '.webm')
     if not file.filename.lower().endswith(allowed_formats):
         raise HTTPException(400, f"Unsupported file format. Must be one of: {', '.join(allowed_formats)}")
