@@ -5,7 +5,8 @@ import './App.css'
 function App() {
     return (
         <Router>
-            <div className="min-h-screen bg-white w-full">
+            <div className="homepage">
+               {/* min-h-screen bg-white w-full */}
                 <Main />
             </div>
         </Router>

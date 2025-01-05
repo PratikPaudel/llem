@@ -124,13 +124,59 @@ function Home() {
         <div className="min-h-screen flex flex-col items-center justify-center -mt-16">
             <div className="w-full max-w-3xl mx-auto px-4">
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-semibold text-gray-900">human™</h1>
-                    <p className="mt-2 text-lg text-gray-600">library of human experiences</p>
+                    <h1 className="text-blue-600 text-4xl font-semibold">Listening...</h1>
+                    {/* <p className="mt-2 text-lg text-gray-600">library of lived experiences</p> */}
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 text-blue-600">
                     {/* Search Input */}
                     <div className="relative">
+    <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+        className="placeholder-blue-400 text-blue-600 w-full h-14 px-6 pr-24 rounded-lg border border-blue-600 bg-white focus:outline-none focus:border-blue-700 focus:ring-1 focus:ring-blue-700 shadow-sm text-lg text-blue-600"
+        placeholder="search the library of lived experiences..."
+    />
+    <div className="absolute right-4 top-4 flex gap-2">
+        {isProcessing ? (
+            <Loader className="w-6 h-6 text-blue-400 animate-spin" />
+        ) : isRecording ? (
+            <button
+                type="button"
+                onClick={stopRecording}
+                className="text-red-500 hover:text-red-600 focus:outline-none"
+                aria-label="Stop Recording"
+            >
+                <Square className="w-6 h-6" />
+            </button>
+        ) : (
+            <button
+                type="button"
+                onClick={startRecording}
+                className="text-blue-600 hover:text-blue-700 focus:outline-none"
+                aria-label="Start Voice Search"
+            >
+                <Mic className="w-6 h-6" />
+            </button>
+        )}
+        <button
+            onClick={() => handleSearch()}
+            disabled={isSearching || !searchQuery.trim()}
+            className="text-blue-600 hover:text-blue-700 focus:outline-none"
+            aria-label="Search"
+        >
+            {isSearching ? (
+                <Loader className="w-6 h-6 animate-spin" />
+            ) : (
+                <Search className="w-6 h-6" />
+            )}
+        </button>
+    </div>
+</div>
+
+                    {/* <div className="relative">
                         <input
                             type="text"
                             value={searchQuery}
@@ -174,13 +220,13 @@ function Home() {
                                 )}
                             </button>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Loading State */}
                     {isSearching && (
                         <div className="text-center py-8">
                             <Loader className="w-8 h-8 animate-spin mx-auto text-gray-400" />
-                            <p className="mt-2 text-gray-600">Finding and analyzing stories...</p>
+                            <p className="mt-2 text-gray-600">Searching for your experience...</p>
                         </div>
                     )}
 

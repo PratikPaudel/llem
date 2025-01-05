@@ -40,3 +40,22 @@
 .read-the-docs {
   color: #888;
 }
+
+.homepage {
+  background-image: url('/workspaces/llem/frontend/src/HOMEPAGE.png'); /* Adjust the path if necessary */
+  background-size: cover; /* Ensure the image covers the entire screen */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Prevent tiling */
+  height: 100%; /* Set height to full viewport */
+}
+
+body {
+  background-image: url('/workspaces/llem/frontend/src/HOMEPAGE.png'); /* Replace with your image path */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100vw; /* Full width */
+  height: 100vh; /* Full height */
+  margin: 0; /* Remove any default margin */
+  padding: 0;
+}
