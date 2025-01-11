@@ -4,13 +4,29 @@ import tempfile
 import os
 import logging
 from typing import IO
+from dotenv import load_dotenv
+from pathlib import Path
+
+# Get the absolute path to the .env file
+base_dir = Path(__file__).resolve().parent.parent.parent
+env_path = base_dir / ".env"
+
+# Load environment variables first
+if os.getenv("ENVIRONMENT") != "production":
+    load_dotenv(dotenv_path=env_path)
 
 logger = logging.getLogger(__name__)
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+class AudioService:
+    def __init__(self):
+        if not os.getenv("OPENAI_API_KEY"):
+            raise ValueError("OPENAI_API_KEY not found in environment variables")
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 async def transcribe_audio(file: UploadFile) -> str:
+    audio_service = AudioService()
     logger.info("Starting transcription process")
 
     # Check file format hi there
@@ -50,7 +66,7 @@ async def transcribe_audio(file: UploadFile) -> str:
 
         # Transcribe using the new OpenAI API format
         with open(temp_file_path, "rb") as audio_file:
-            transcript = client.audio.transcriptions.create(
+            transcript = audio_service.client.audio.transcriptions.create(
                 model="whisper-1", file=audio_file, response_format="text"
             )
 

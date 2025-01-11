@@ -1,13 +1,21 @@
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 
-# Load environment variables
-load_dotenv(dotenv_path="backend/.env")
+# Get the absolute path to the .env file
+base_dir = Path(__file__).resolve().parent.parent.parent
+env_path = base_dir / ".env"
+
+# Load environment variables first
+if os.getenv("ENVIRONMENT") != "production":
+    load_dotenv(dotenv_path=env_path)
 
 
 class QueryService:
     def __init__(self):
+        if not os.getenv("OPENAI_API_KEY"):
+            raise ValueError("OPENAI_API_KEY not found in environment variables")
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     async def refine_query(self, original_query: str) -> str:

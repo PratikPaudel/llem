@@ -3,7 +3,17 @@ import json
 import logging
 from openai import OpenAI
 from fastapi import HTTPException
+from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+# Get the absolute path to the .env file
+base_dir = Path(__file__).resolve().parent.parent.parent
+env_path = base_dir / ".env"
+
+# Load environment variables first
+if os.getenv("ENVIRONMENT") != "production":
+    load_dotenv(dotenv_path=env_path)
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +21,8 @@ logger = logging.getLogger(__name__)
 class SummaryService:
     def __init__(self):
         logger.info("Initializing SummaryService")
+        if not os.getenv("OPENAI_API_KEY"):
+            raise ValueError("OPENAI_API_KEY not found in environment variables")
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     async def summarize_results(self, results: List[Dict], query: str) -> Dict:
