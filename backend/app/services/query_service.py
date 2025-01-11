@@ -1,8 +1,14 @@
 from openai import OpenAI
+from dotenv import load_dotenv
+import os
+
+# Load environment variables
+load_dotenv(dotenv_path="backend/.env")
+
 
 class QueryService:
     def __init__(self):
-        self.client = OpenAI(api_key="")
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     async def refine_query(self, original_query: str) -> str:
         try:
@@ -17,12 +23,12 @@ class QueryService:
                         - Use natural, conversational language
                         - Focus on emotional and experiential aspects if applicable
                         - Keep it under 2-3 sentences
-                        """
+                        """,
                     },
-                    {"role": "user", "content": original_query}
+                    {"role": "user", "content": original_query},
                 ],
                 temperature=0.7,
-                max_tokens=200
+                max_tokens=200,
             )
 
             refined_query = response.choices[0].message.content.strip()

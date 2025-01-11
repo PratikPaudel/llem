@@ -4,27 +4,41 @@ import tempfile
 import os
 import logging
 from typing import IO
-from ..config import get_settings
 
 logger = logging.getLogger(__name__)
 
-client = OpenAI(
-    api_key=""
-)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+
 async def transcribe_audio(file: UploadFile) -> str:
     logger.info("Starting transcription process")
 
     # Check file format hi there
-    allowed_formats = ('.flac', '.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.ogg', '.wav', '.webm')
+    allowed_formats = (
+        ".flac",
+        ".mp3",
+        ".mp4",
+        ".mpeg",
+        ".mpga",
+        ".m4a",
+        ".ogg",
+        ".wav",
+        ".webm",
+    )
     if not file.filename.lower().endswith(allowed_formats):
-        raise HTTPException(400, f"Unsupported file format. Must be one of: {', '.join(allowed_formats)}")
+        raise HTTPException(
+            400,
+            f"Unsupported file format. Must be one of: {', '.join(allowed_formats)}",
+        )
 
     temp_file: IO | None = None
     temp_file_path: str | None = None
 
     try:
         # Create a temporary file
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1])
+        temp_file = tempfile.NamedTemporaryFile(
+            delete=False, suffix=os.path.splitext(file.filename)[1]
+        )
         temp_file_path = temp_file.name
 
         # Write the uploaded file content
@@ -35,11 +49,9 @@ async def transcribe_audio(file: UploadFile) -> str:
         temp_file.close()
 
         # Transcribe using the new OpenAI API format
-        with open(temp_file_path, 'rb') as audio_file:
+        with open(temp_file_path, "rb") as audio_file:
             transcript = client.audio.transcriptions.create(
-                model="whisper-1",
-                file=audio_file,
-                response_format="text"
+                model="whisper-1", file=audio_file, response_format="text"
             )
 
         return transcript
