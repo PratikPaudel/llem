@@ -48,7 +48,7 @@ async def health_check():
 
 async def keep_alive():
     """Background task to keep the server alive"""
-    url = "http://localhost:8000/health-check"  # Update with your actual URL if needed
+    url = "https://llem.onrender.com/health-check"  # Use the public URL
     async with httpx.AsyncClient() as client:
         while True:
             try:
