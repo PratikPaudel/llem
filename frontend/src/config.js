@@ -3,5 +3,5 @@ export const getApiBaseUrl = () => {
         window.location.hostname === '127.0.0.1';
     return isDevelopment
         ? 'http://localhost:8000/api'
-        : 'https://llem.onrender.com/api';
+        : 'https://llem-0e8i.onrender.com/api';
 };
