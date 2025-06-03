@@ -11,6 +11,10 @@ A modern web application that allows users to search through an archive of human
 - ⚡ **Real-time Processing**: Immediate feedback and processing status indicators
 - 🎨 **Modern UI**: Clean, responsive interface built with React and Tailwind CSS
 
+## System Architecture
+
+![Architecture Diagram](architecture-diagram.png)
+
 ## Tech Stack
 
 ### Backend
